@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - appnet
+
+  server:
+    build: ./server
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - appnet
+    environment:
+      - POSTGRES_PASSWORD=yourpassword
+
+  client:
+    build: ./client
+    depends_on:
+      - server
+    networks:
+      - appnet
+    stdin_open: true
+    tty: true
+
+volumes:
+  pgdata:
+
+networks:
+  appnet:
